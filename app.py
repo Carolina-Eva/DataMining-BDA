@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
 import plotly.express as px
-from sklearn.tree import plot_tree
-
+import graphviz
+from sklearn.tree import plot_tree, export_graphviz, export_text
 
 # -----------------------------
 # CONFIGURACIÓN DEL DASHBOARD
@@ -84,7 +84,7 @@ section = st.sidebar.radio("Navegar a:", [
     "Clustering (PCA + KMeans)",
     "Importancia del Modelo",
     "Predicción de Tipo Estelar",
-    "Predicción con Árbol",
+    "Reglas del Árbol",
     "Árbol de Decisión"
 ])
 
@@ -192,36 +192,37 @@ if section == "Predicción de Tipo Estelar":
 
     st.success(f"⭐ El modelo Random Forest predice que la estrella es: **{class_names[pred]}**")
 
-
-if section == "Predicción con Árbol":
-    st.subheader("🔮 Predicción usando Árbol de Decisión")
-
-    temp = st.number_input("Temperatura (K)", 1000.0, 50000.0, 5800.0)
-    lum = st.number_input("Luminosidad (L/Lo)", 0.001, 100000.0, 1.0)
-    rad = st.number_input("Radio (R/Ro)", 0.001, 1000.0, 1.0)
-    mag = st.number_input("Magnitud Absoluta (Mv)", -10.0, 20.0, 4.8)
-
-    # Opciones originales
-    col = st.selectbox("Star color", le_color.classes_)
-    spec = st.selectbox("Spectral Class", le_spec.classes_)
-
-    # Encoding
-    col_enc = le_color.transform([col])[0]
-    spec_enc = le_spec.transform([spec])[0]
-
-    X_new = np.array([[temp, lum, rad, mag, col_enc, spec_enc]])
-
-    # Escalar
-    X_scaled_new = scaler.transform(X_new)
-
-    # Predicción (CORREGIDO)
-    pred_tree = int(tree.predict(X_scaled_new)[0])
-
-    st.success(f"🌟 El Árbol predice: **{class_names[pred_tree]}**")
-
 # -----------------------------
 # 6. ÁRBOL DE DECISIÓN (IMAGEN)
 # -----------------------------
+
+if section == "Reglas del Árbol":
+    st.subheader("🌳 Reglas del Árbol — Diagrama Visual")
+
+    dot_data = export_graphviz(
+        tree,
+        out_file=None,
+        feature_names=features,
+        class_names=class_names,
+        filled=True,
+        rounded=True,
+        special_characters=True
+    )
+
+    graph = graphviz.Source(dot_data)
+    st.graphviz_chart(dot_data)
+
+    st.subheader("📜 Reglas Interpretables del Árbol")
+
+    rules = export_text(tree, feature_names=features)
+
+    # Reemplazar números por nombres reales
+    for i, label in enumerate(class_names):
+        rules = rules.replace(f"class: {i}", f"class: {label}")
+
+    st.text(rules)
+
+
 if section == "Árbol de Decisión":
     st.subheader("🌳 Árbol de Decisión")
 
@@ -235,4 +236,6 @@ if section == "Árbol de Decisión":
         fontsize=10
     )
     st.pyplot(fig)
+
+
 
