@@ -164,25 +164,30 @@ if section == "Importancia del Modelo":
 # 5. PREDICCIÓN
 # -----------------------------
 if section == "Predicción de Tipo Estelar":
-    st.subheader("🔮 Predicción con el Modelo Random Forest")
+    st.subheader("🔮 Predicción con el Modelo Entrenado (Random Forest)")
 
     temp = st.number_input("Temperatura (K)", 1000.0, 50000.0, 5800.0)
-    lum  = st.number_input("Luminosidad (L/Lo)", 0.0001, 100000.0, 1.0)
-    rad  = st.number_input("Radio (R/Ro)", 0.0001, 1000.0, 1.0)
-    mag  = st.number_input("Magnitud Absoluta (Mv)", -10.0, 20.0, 4.8)
+    lum = st.number_input("Luminosidad (L/Lo)", 0.001, 100000.0, 1.0)
+    rad = st.number_input("Radio (R/Ro)", 0.001, 1000.0, 1.0)
+    mag = st.number_input("Magnitud Absoluta (Mv)", -10.0, 20.0, 4.8)
 
-    col_encoded  = st.number_input("Color codificado", 0, 10, 3)
-    spec_encoded = st.number_input("Espectral codificado", 0, 10, 3)
+    col = st.selectbox("Star color", le_color.classes_)
+    spec = st.selectbox("Spectral Class", le_spec.classes_)
 
-    # Formar vector
-    X_new = np.array([[temp, lum, rad, mag, col_encoded, spec_encoded]])
+    # Encoding
+    col_enc = le_color.transform([col])[0]
+    spec_enc = le_spec.transform([spec])[0]
 
-    # Escalar con el scaler del modelo
-    X_scaled = rf_scaler.transform(X_new)
+    # Crear vector
+    X_new = np.array([[temp, lum, rad, mag, col_enc, spec_enc]])
 
-    pred = rf_model.predict(X_scaled)[0]
+    # Escalar
+    X_scaled = modelo_rf["scaler"].transform(X_new)
 
-    st.success(f"⭐ El modelo predice que la estrella es: **{rf_class_names[pred]}**")
+    # Predicción
+    pred = int(modelo_rf["model"].predict(X_scaled)[0])   # <-- FIX
+
+    st.success(f"⭐ El modelo predice que la estrella es: **{class_names[pred]}**")
 
 
 if section == "Predicción con Árbol":
