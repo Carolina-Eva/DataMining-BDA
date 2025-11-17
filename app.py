@@ -34,7 +34,7 @@ def load_model():
 
 @st.cache_resource
 def load_tree():
-    return joblib.load("arbol_estelar.pkl")
+    return joblib.load("modelo_arbol_estelar.pkl")
 
 # Cargar árboles y modelos
 df = load_data()
