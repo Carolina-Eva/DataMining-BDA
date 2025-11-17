@@ -7,22 +7,20 @@ Incluye un flujo completo de ETL + Machine Learning supervisado + Clustering + V
 
 🚀 Características principales del Dashboard
 
-✔ Limpieza y transformación del dataset (ETL)
-✔ Visualizaciones astronómicas:
+⭐ Limpieza y transformación del dataset (ETL)
 
-Diagrama Hertzsprung–Russell
+⭐ Visualizaciones astronómicas:
+- Diagrama Hertzsprung–Russell
+- Mapas de calor, distribuciones y correlaciones
+- PCA para reducción de dimensionalidad
+- Modelos de Machine Learning:
 
-Mapas de calor, distribuciones y correlaciones
+⭐ Árbol de Decisión
 
-PCA para reducción de dimensionalidad
-✔ Modelos de Machine Learning:
+⭐ Random Forest
+- Exportación e interpretación de reglas del árbol de decisión
+- Clustering no supervisado (K-Means + PCA)
+- Descarga del modelo entrenado (modelo_estelar.pkl)
+- Dashboard listo para ejecutarse en Streamlit Cloud
 
-Árbol de Decisión
-
-Random Forest
-✔ Exportación e interpretación de reglas del árbol de decisión
-✔ Clustering no supervisado (K-Means + PCA)
-✔ Descarga del modelo entrenado (modelo_estelar.pkl)
-✔ Dashboard listo para ejecutarse en Streamlit Cloud
-
-Link: https://datamining-bda-ctwadnermajhdynxrqu9pu.streamlit.app/
+⭐⭐⭐ Link: https://datamining-bda-ctwadnermajhdynxrqu9pu.streamlit.app/ ⭐⭐⭐
