@@ -38,10 +38,15 @@ def load_tree():
 
 # Cargar árboles y modelos
 df = load_data()
-model = load_model()
-modelo_arbol = load_tree()
+
+modelo_rf = load_model()
+rf_model = modelo_rf["model"]
+rf_scaler = modelo_rf["scaler"]
+rf_features = modelo_rf["features"]
+rf_class_names = modelo_rf["class_names"]
 
 # Acceder a los elementos guardados en el árbol
+modelo_arbol = load_tree()
 tree = modelo_arbol["tree"]
 scaler = modelo_arbol["scaler"]
 le_color = modelo_arbol["encoder_color"]
@@ -159,30 +164,25 @@ if section == "Importancia del Modelo":
 # 5. PREDICCIÓN
 # -----------------------------
 if section == "Predicción de Tipo Estelar":
-    st.subheader("🔮 Predicción con el Modelo Entrenado")
+    st.subheader("🔮 Predicción con el Modelo Random Forest")
 
     temp = st.number_input("Temperatura (K)", 1000.0, 50000.0, 5800.0)
-    lum = st.number_input("Luminosidad (L/Lo)", 0.001, 100000.0, 1.0)
-    rad = st.number_input("Radio (R/Ro)", 0.001, 1000.0, 1.0)
-    mag = st.number_input("Magnitud Absoluta (Mv)", -10.0, 20.0, 4.8)
+    lum  = st.number_input("Luminosidad (L/Lo)", 0.0001, 100000.0, 1.0)
+    rad  = st.number_input("Radio (R/Ro)", 0.0001, 1000.0, 1.0)
+    mag  = st.number_input("Magnitud Absoluta (Mv)", -10.0, 20.0, 4.8)
 
-    col = st.selectbox("Star color", le_color.classes_)
-    spec = st.selectbox("Spectral Class", le_spec.classes_)
+    col_encoded  = st.number_input("Color codificado", 0, 10, 3)
+    spec_encoded = st.number_input("Espectral codificado", 0, 10, 3)
 
-    # Codificar variables categóricas
-    col_enc = le_color.transform([col])[0]
-    spec_enc = le_spec.transform([spec])[0]
+    # Formar vector
+    X_new = np.array([[temp, lum, rad, mag, col_encoded, spec_encoded]])
 
-    # Matriz de entrada
-    X_new = np.array([[temp, lum, rad, mag, col_enc, spec_enc]])
+    # Escalar con el scaler del modelo
+    X_scaled = rf_scaler.transform(X_new)
 
-    # ESCALAR
-    X_new_scaled = scaler.transform(X_new)
+    pred = rf_model.predict(X_scaled)[0]
 
-    # Predicción
-    pred = model.predict(X_new_scaled)[0]
-
-    st.success(f"⭐ El modelo predice que la estrella es: **{star_names[pred]}**")
+    st.success(f"⭐ El modelo predice que la estrella es: **{rf_class_names[pred]}**")
 
 
 if section == "Predicción con Árbol":
