@@ -149,7 +149,7 @@ if section == "Importancia del Modelo":
         "spectral_encoded"
     ]
 
-    importances = model.feature_importances_
+    importances = modelo_rf.feature_importances_
 
     fig2 = px.bar(
         x=importances,
@@ -174,20 +174,23 @@ if section == "Predicción de Tipo Estelar":
     col = st.selectbox("Star color", le_color.classes_)
     spec = st.selectbox("Spectral Class", le_spec.classes_)
 
-    # Encoding
+    # Codificar variables categóricas
     col_enc = le_color.transform([col])[0]
     spec_enc = le_spec.transform([spec])[0]
 
-    # Crear vector
+    # Crear matriz de entrada
     X_new = np.array([[temp, lum, rad, mag, col_enc, spec_enc]])
 
-    # Escalar
-    X_scaled = modelo_rf["scaler"].transform(X_new)
+    # Convertir a DataFrame para que mantenga nombres de columnas
+    X_new_df = pd.DataFrame(X_new, columns=features)
+
+    # Escalar con el scaler entrenado
+    X_scaled = scaler.transform(X_new_df)
 
     # Predicción
-    pred = int(modelo_rf["model"].predict(X_scaled)[0])   # <-- FIX
+    pred = int(modelo_rf["model"].predict(X_scaled)[0])
 
-    st.success(f"⭐ El modelo predice que la estrella es: **{class_names[pred]}**")
+    st.success(f"⭐ El modelo Random Forest predice que la estrella es: **{class_names[pred]}**")
 
 
 if section == "Predicción con Árbol":
@@ -211,8 +214,8 @@ if section == "Predicción con Árbol":
     # Escalar
     X_scaled_new = scaler.transform(X_new)
 
-    # Predicción
-    pred_tree = tree.predict(X_scaled_new)[0]
+    # Predicción (CORREGIDO)
+    pred_tree = int(tree.predict(X_scaled_new)[0])
 
     st.success(f"🌟 El Árbol predice: **{class_names[pred_tree]}**")
 
