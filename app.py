@@ -5,9 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
 import plotly.express as px
-from sklearn.tree import plot_tree, export_graphviz, export_text
-import graphviz
-
+from sklearn.tree import plot_tree, export_text
+from sklearn.tree import _tree
 # -----------------------------
 # CONFIGURACIÓN DEL DASHBOARD
 # -----------------------------
@@ -199,28 +198,41 @@ if section == "Predicción de Tipo Estelar":
 if section == "Reglas del Árbol":
     st.subheader("🌳 Reglas del Árbol — Diagrama Visual")
 
-    dot_data = export_graphviz(
-        tree,
-        out_file=None,
-        feature_names=features,
-        class_names=class_names,
-        filled=True,
-        rounded=True,
-        special_characters=True
-    )
+    def export_ascii(tree, feature_names, class_names):
 
-    graph = graphviz.Source(dot_data)
-    st.graphviz_chart(dot_data)
+        tree_ = tree.tree_
+
+        def recurse(node, depth):
+            indent = "   " * depth
+            if tree_.feature[node] != _tree.TREE_UNDEFINED:
+                name = feature_names[tree_.feature[node]]
+                threshold = tree_.threshold[node]
+
+                text = f"{indent}├── {name} <= {threshold:.2f}\n"
+                text += recurse(tree_.children_left[node], depth + 1)
+
+                text += f"{indent}└── {name} > {threshold:.2f}\n"
+                text += recurse(tree_.children_right[node], depth + 1)
+
+                return text
+            else:
+                # Leaf node
+                value = tree_.value[node].argmax()
+                return f"{indent}🎯 class: {class_names[value]}\n"
+
+        return recurse(0, 0)
+
+    ascii_tree = export_ascii(tree, features, class_names)
+    st.text(ascii_tree)
 
     st.subheader("📜 Reglas Interpretables del Árbol")
 
-    rules = export_text(tree, feature_names=features)
+    rules_raw = export_text(tree, feature_names=features)
 
-    # Reemplazar números por nombres reales
-    for i, label in enumerate(class_names):
-        rules = rules.replace(f"class: {i}", f"class: {label}")
+    for code, label in enumerate(class_names):
+        rules_raw = rules_raw.replace(f"class: {code}", f"class: {label}")
 
-    st.text(rules)
+    st.code(rules_raw, language="txt")
 
 
 if section == "Árbol de Decisión":
