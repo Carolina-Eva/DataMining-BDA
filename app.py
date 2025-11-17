@@ -83,6 +83,7 @@ section = st.sidebar.radio("Navegar a:", [
     "Clustering (PCA + KMeans)",
     "Importancia del Modelo",
     "Predicción de Tipo Estelar",
+    "Test automático del modelo",
     "Reglas del Árbol",
     "Árbol de Decisión"
 ])
@@ -190,6 +191,63 @@ if section == "Predicción de Tipo Estelar":
     pred = int(modelo_rf["model"].predict(X_scaled)[0])
 
     st.success(f"⭐ El modelo Random Forest predice que la estrella es: **{class_names[pred]}**")
+
+# -----------------------------
+#  TEST AUTOMÁTICO DEL MODELO
+# -----------------------------
+if section == "Test automático del modelo":
+    st.subheader("🧪 Test Automático del Modelo (Random Forest)")
+
+    st.markdown("Este panel prueba automáticamente el modelo utilizando ejemplos típicos de cada tipo estelar.")
+
+    # Casos de prueba representativos
+    test_cases = [
+        # temp, lum, rad, mag, color, spec, label
+        [2500, 0.0005, 0.2, 16, 0, 0, "Brown Dwarf"],
+        [3300, 0.02, 0.4, 12, 1, 1, "Red Dwarf"],
+        [9000, 0.8, 0.01, 10.5, 4, 2, "White Dwarf"],
+        [5800, 1.0, 1.0, 4.8, 3, 5, "Main Sequence"],
+        [9000, 10000, 40, -6, 2, 3, "Supergiant"],
+        [30000, 500000, 70, -9, 5, 4, "Hypergiant"]
+    ]
+
+    df_test = pd.DataFrame(test_cases,
+        columns=["Temperature (K)", "Luminosity(L/Lo)", "Radius(R/Ro)",
+                 "Absolute magnitude(Mv)", "color_encoded", "spectral_encoded", "Real"])
+
+    st.dataframe(df_test)
+
+    st.markdown("---")
+    st.markdown("### ▶ Ejecutar Test Automático")
+
+    if st.button("Probar modelo"):
+        resultados = []
+        for _, row in df_test.iterrows():
+            X = np.array([[
+                row["Temperature (K)"],
+                row["Luminosity(L/Lo)"],
+                row["Radius(R/Ro)"],
+                row["Absolute magnitude(Mv)"],
+                row["color_encoded"],
+                row["spectral_encoded"]
+            ]])
+
+            # Escalar
+            X_scaled = rf_scaler.transform(X)
+
+            # Predicción
+            pred = rf_model.predict(X_scaled)[0]
+            pred_label = rf_class_names[int(pred)]
+
+            resultados.append({
+                "Real": row["Real"],
+                "Predicción": pred_label,
+                "¿Correcto?": "✅ Sí" if pred_label == row["Real"] else "❌ No"
+            })
+
+        st.markdown("### 📊 Resultados del test")
+        st.table(pd.DataFrame(resultados))
+
 
 # -----------------------------
 # 6. ÁRBOL DE DECISIÓN (IMAGEN)
