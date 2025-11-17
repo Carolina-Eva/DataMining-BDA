@@ -30,10 +30,14 @@ def load_data():
 def load_model():
     return joblib.load("modelo_estelar.pkl")
 
+@st.cache_resource
+def load_tree():
+    return joblib.load("arbol_estelar.pkl")
+
+tree = load_tree()
 
 df = load_data()
 model = load_model()
-tree = load_model()
 
 # Paleta de colores
 star_palette = {
@@ -158,30 +162,43 @@ if section == "Predicción de Tipo Estelar":
 
     st.success(f"El modelo predice que la estrella es: **{star_names[pred]}**")
 
+if section == "Predicción con Árbol":
+    st.subheader("🔮 Predicción usando Árbol de Decisión")
+
+    temp = st.number_input("Temperatura (K)", 1000.0, 50000.0, 5800.0)
+    lum = st.number_input("Luminosidad (L/Lo)", 0.001, 100000.0, 1.0)
+    rad = st.number_input("Radio (R/Ro)", 0.001, 1000.0, 1.0)
+    mag = st.number_input("Magnitud Absoluta (Mv)", -10.0, 20.0, 4.8)
+
+    col = st.selectbox("Star color", le_color.classes_)
+    spec = st.selectbox("Spectral Class", le_spec.classes_)
+
+    col_enc = le_color.transform([col])[0]
+    spec_enc = le_spec.transform([spec])[0]
+
+    X_new = np.array([[temp, lum, rad, mag, col_enc, spec_enc]])
+
+    X_scaled_new = scaler.transform(X_new)
+
+    pred_tree = modelo["tree"].predict(X_scaled_new)[0]
+
+    st.success(f"El Árbol de Decisión predice: **{class_names[pred_tree]}**")
+
+
 # -----------------------------
 # 6. ÁRBOL DE DECISIÓN (IMAGEN)
 # -----------------------------
 if section == "Árbol de Decisión (Generado en vivo)":
     st.subheader("🌳 Árbol de Decisión (Generado en vivo)")
 
-    fig, ax = plt.subplots(figsize=(20, 10))
+    fig, ax = plt.subplots(figsize=(22, 12))
     plot_tree(
-        tree,
-        feature_names=[
-            "Temperature (K)",
-            "Luminosity(L/Lo)",
-            "Radius(R/Ro)",
-            "Absolute magnitude(Mv)",
-            "color_encoded",
-            "spectral_encoded"
-        ],
-        class_names=[
-            "Brown Dwarf","Red Dwarf","White Dwarf",
-            "Main Sequence","Supergiant","Hypergiant"
-        ],
+        model["tree"],
+        feature_names=model["features"],
+        class_names=model["class_names"],
         filled=True,
         rounded=True,
-        fontsize=8,
+        fontsize=10,
         ax=ax
     )
     st.pyplot(fig)
