@@ -30,7 +30,7 @@ def load_data():
 
 @st.cache_resource
 def load_model():
-    return joblib.load("modelo_estelar.pkl")
+    return joblib.load("modelo_estelar_RF.pkl")
 
 @st.cache_resource
 def load_tree():
@@ -165,13 +165,25 @@ if section == "Predicción de Tipo Estelar":
     lum = st.number_input("Luminosidad (L/Lo)", 0.001, 100000.0, 1.0)
     rad = st.number_input("Radio (R/Ro)", 0.001, 1000.0, 1.0)
     mag = st.number_input("Magnitud Absoluta (Mv)", -10.0, 20.0, 4.8)
-    col = st.number_input("Color codificado", 0, 10, 3)
-    spec = st.number_input("Espectral codificado", 0, 10, 3)
 
-    X_new = np.array([[temp, lum, rad, mag, col, spec]])
-    pred = model.predict(X_new)[0]
+    col = st.selectbox("Star color", le_color.classes_)
+    spec = st.selectbox("Spectral Class", le_spec.classes_)
 
-    st.success(f"El modelo predice que la estrella es: **{star_names[pred]}**")
+    # Codificar variables categóricas
+    col_enc = le_color.transform([col])[0]
+    spec_enc = le_spec.transform([spec])[0]
+
+    # Matriz de entrada
+    X_new = np.array([[temp, lum, rad, mag, col_enc, spec_enc]])
+
+    # ESCALAR
+    X_new_scaled = scaler.transform(X_new)
+
+    # Predicción
+    pred = model.predict(X_new_scaled)[0]
+
+    st.success(f"⭐ El modelo predice que la estrella es: **{star_names[pred]}**")
+
 
 if section == "Predicción con Árbol":
     st.subheader("🔮 Predicción usando Árbol de Decisión")
