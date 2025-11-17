@@ -161,4 +161,14 @@ if section == "Predicción de Tipo Estelar":
 # -----------------------------
 if section == "Árbol de Decisión (Imagen)":
     st.subheader("🌳 Árbol de Decisión (Exportado)")
-    st.image("arbol_estelar_coloreado.png", caption="Árbol de decisión exportado")
+    fig, ax = plt.subplots(figsize=(22, 12))
+    plot_tree(
+        tree,
+        feature_names=features,
+        class_names=class_names,
+        filled=True,
+        rounded=True,
+        fontsize=10,
+        ax=ax
+    )
+    st.pyplot(fig)
