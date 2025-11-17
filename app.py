@@ -30,8 +30,10 @@ def load_data():
 def load_model():
     return joblib.load("modelo_estelar.pkl")
 
+
 df = load_data()
 model = load_model()
+tree = load_model()
 
 # Paleta de colores
 star_palette = {
@@ -159,17 +161,27 @@ if section == "Predicción de Tipo Estelar":
 # -----------------------------
 # 6. ÁRBOL DE DECISIÓN (IMAGEN)
 # -----------------------------
-if section == "Árbol de Decisión (Imagen)":
+if section == "Árbol de Decisión (Generado en vivo)":
     st.subheader("🌳 Árbol de Decisión (Generado en vivo)")
 
-    fig, ax = plt.subplots(figsize=(20, 12))
+    fig, ax = plt.subplots(figsize=(20, 10))
     plot_tree(
         tree,
-        feature_names=features,
-        class_names=class_names,
+        feature_names=[
+            "Temperature (K)",
+            "Luminosity(L/Lo)",
+            "Radius(R/Ro)",
+            "Absolute magnitude(Mv)",
+            "color_encoded",
+            "spectral_encoded"
+        ],
+        class_names=[
+            "Brown Dwarf","Red Dwarf","White Dwarf",
+            "Main Sequence","Supergiant","Hypergiant"
+        ],
         filled=True,
         rounded=True,
-        fontsize=10,
+        fontsize=8,
         ax=ax
     )
     st.pyplot(fig)
