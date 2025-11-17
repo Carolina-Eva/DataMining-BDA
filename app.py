@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
 import plotly.express as px
+from sklearn.tree import plot_tree
+
 
 # -----------------------------
 # CONFIGURACIÓN DEL DASHBOARD
@@ -35,9 +37,21 @@ def load_tree():
     return joblib.load("arbol_estelar.pkl")
 
 tree = load_tree()
-
 df = load_data()
 model = load_model()
+
+# Cargar árboles y modelos
+modelo_arbol = load_tree()
+modelo_rf = load_model()
+
+# Acceder a los elementos guardados en el árbol
+tree = modelo_arbol["tree"]
+scaler = modelo_arbol["scaler"]
+le_color = modelo_arbol["encoder_color"]
+le_spec = modelo_arbol["encoder_spec"]
+features = modelo_arbol["features"]
+class_names = modelo_arbol["class_names"]
+
 
 # Paleta de colores
 star_palette = {
@@ -171,36 +185,38 @@ if section == "Predicción con Árbol":
     rad = st.number_input("Radio (R/Ro)", 0.001, 1000.0, 1.0)
     mag = st.number_input("Magnitud Absoluta (Mv)", -10.0, 20.0, 4.8)
 
+    # Opciones originales
     col = st.selectbox("Star color", le_color.classes_)
     spec = st.selectbox("Spectral Class", le_spec.classes_)
 
+    # Encoding
     col_enc = le_color.transform([col])[0]
     spec_enc = le_spec.transform([spec])[0]
 
     X_new = np.array([[temp, lum, rad, mag, col_enc, spec_enc]])
 
+    # Escalar
     X_scaled_new = scaler.transform(X_new)
 
-    pred_tree = modelo["tree"].predict(X_scaled_new)[0]
+    # Predicción
+    pred_tree = tree.predict(X_scaled_new)[0]
 
-    st.success(f"El Árbol de Decisión predice: **{class_names[pred_tree]}**")
-
+    st.success(f"🌟 El Árbol predice: **{class_names[pred_tree]}**")
 
 # -----------------------------
 # 6. ÁRBOL DE DECISIÓN (IMAGEN)
 # -----------------------------
-if section == "Árbol de Decisión (Generado en vivo)":
-    st.subheader("🌳 Árbol de Decisión (Generado en vivo)")
+if section == "Árbol de Decisión":
+    st.subheader("🌳 Árbol de Decisión")
 
     fig, ax = plt.subplots(figsize=(22, 12))
     plot_tree(
-        model["tree"],
-        feature_names=model["features"],
-        class_names=model["class_names"],
+        tree,
+        feature_names=features,
+        class_names=class_names,
         filled=True,
         rounded=True,
-        fontsize=10,
-        ax=ax
+        fontsize=10
     )
     st.pyplot(fig)
 
