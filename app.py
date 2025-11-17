@@ -69,7 +69,8 @@ section = st.sidebar.radio("Navegar a:", [
     "Clustering (PCA + KMeans)",
     "Importancia del Modelo",
     "Predicción de Tipo Estelar",
-    "Árbol de Decisión (Imagen)"
+    "Predicción con Árbol",
+    "Árbol de Decisión"
 ])
 
 # -----------------------------
