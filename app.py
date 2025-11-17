@@ -55,7 +55,7 @@ star_names = {
 # -----------------------------
 # SIDEBAR
 # -----------------------------
-st.sidebar.image("https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Hertzsprung-Russell_diagram.svg/640px-Hertzsprung-Russell_diagram.svg.png", width=220)
+st.sidebar.image("star.png", width=200)
 st.sidebar.title("Opciones")
 section = st.sidebar.radio("Navegar a:", [
     "Ver dataset",
