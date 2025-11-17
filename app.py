@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
 import plotly.express as px
-import graphviz
 from sklearn.tree import plot_tree, export_graphviz, export_text
+import graphviz
 
 # -----------------------------
 # CONFIGURACIÓN DEL DASHBOARD
