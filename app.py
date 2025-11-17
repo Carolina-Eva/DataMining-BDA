@@ -8,7 +8,7 @@ st.title("🌟 Análisis de Estrellas - TP Data Mining")
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("estrellas_procesadas.csv")
+    df = pd.read_csv("estrellas_limpias.csv")
     return df
 
 df = load_data()
