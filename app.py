@@ -36,13 +36,10 @@ def load_model():
 def load_tree():
     return joblib.load("arbol_estelar.pkl")
 
-tree = load_tree()
+# Cargar árboles y modelos
 df = load_data()
 model = load_model()
-
-# Cargar árboles y modelos
 modelo_arbol = load_tree()
-modelo_rf = load_model()
 
 # Acceder a los elementos guardados en el árbol
 tree = modelo_arbol["tree"]
@@ -51,7 +48,6 @@ le_color = modelo_arbol["encoder_color"]
 le_spec = modelo_arbol["encoder_spec"]
 features = modelo_arbol["features"]
 class_names = modelo_arbol["class_names"]
-
 
 # Paleta de colores
 star_palette = {
