@@ -148,7 +148,7 @@ if section == "Importancia del Modelo":
         "spectral_encoded"
     ]
 
-    importances = modelo_rf.feature_importances_
+    importances = rf_model.feature_importances_
 
     fig2 = px.bar(
         x=importances,
