@@ -25,3 +25,4 @@ Random Forest
 ✔ Descarga del modelo entrenado (modelo_estelar.pkl)
 ✔ Dashboard listo para ejecutarse en Streamlit Cloud
 
+Link: https://datamining-bda-ctwadnermajhdynxrqu9pu.streamlit.app/
